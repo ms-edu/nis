@@ -230,6 +230,15 @@
       font-style: italic;
     }
 
+    .info-awal {
+      background: #fef9e3;
+      border-left: 5px solid #fbbf24;
+      padding: 1.5rem;
+      border-radius: 20px;
+      text-align: center;
+      color: #92400e;
+    }
+
     footer {
       text-align: center;
       margin-top: 2rem;
@@ -264,7 +273,7 @@
     <div class="logo-area">
       <img src="https://upload.wikimedia.org/wikipedia/commons/9/9a/Kementerian_Agama_new_logo.png" alt="Logo Kementerian Agama" onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Crect%20width%3D%22100%22%20height%3D%22100%22%20fill%3D%22%231e6f5c%22%2F%3E%3Ctext%20x%3D%2250%25%22%20y%3D%2250%25%22%20dominant-baseline%3D%22middle%22%20text-anchor%3D%22middle%22%20fill%3D%22white%22%20font-size%3D%2212%22%3EKemenag%3C%2Ftext%3E%3C%2Fsvg%3E';">
     </div>
-    <h1>Nomor Induk Siswa (NIS)<BR>MIN SINGKAWANG</h1>
+    <h1>NOMOR INDUK SISWA (NIS)<BR>MIN SINGKAWANG</h1>
     <p>Tahun Pelajaran 2025/2026</p>
     <div class="badge-info">Data Kelas 4A · 4B · 4C · 5A · 5B · 6A · 6B</div>
   </div>
@@ -296,8 +305,8 @@
   </div>
 
   <div class="stats">
-    <div class="result-count" id="resultInfo">Menampilkan semua siswa</div>
-    <div style="font-size: 0.8rem;">✨ klik reset untuk melihat semua data</div>
+    <div class="result-count" id="resultInfo">Belum ada pencarian</div>
+    <div style="font-size: 0.8rem;">✨ Masukkan nama atau pilih kelas untuk menampilkan data</div>
   </div>
 
   <div class="table-container">
@@ -306,7 +315,11 @@
         <tr><th>NIS</th><th>Nama Lengkap</th><th>Kelas/Rombel</th></tr>
       </thead>
       <tbody id="tableBody">
-        <tr><td colspan="3" class="empty-message">Memuat data...</td></tr>
+        <tr><td colspan="3" class="empty-message info-awal">
+          🔍 <strong>Selamat datang!</strong><br><br>
+          Silakan ketik nama siswa atau pilih kelas, lalu tekan tombol <strong>Cari</strong>.<br>
+          Data siswa akan muncul setelah Anda melakukan pencarian.
+        </td></tr>
       </tbody>
     </table>
   </div>
@@ -522,25 +535,17 @@
   const btnReset = document.getElementById('btnReset');
   const resultInfo = document.getElementById('resultInfo');
 
-  // fungsi render tabel
-  function renderTable(dataArray) {
-    if (!dataArray.length) {
-      tbody.innerHTML = '<tr><td colspan="3" class="empty-message">✨ Tidak ditemukan siswa yang cocok. Coba kata kunci lain atau reset filter.</td></tr>';
-      resultInfo.innerText = `Tidak ada hasil`;
-      return;
-    }
-    let html = '';
-    for (let s of dataArray) {
-      html += `<tr>
-        <td><strong>${escapeHtml(s.nis)}</strong></td>
-        <td>${escapeHtml(s.nama)}</td>
-        <td><span class="kelas-badge">${escapeHtml(s.kelas)}</span></td>
-      </tr>`;
-    }
-    tbody.innerHTML = html;
-    resultInfo.innerText = `📌 ${dataArray.length} siswa ditemukan`;
+  // Fungsi untuk menampilkan pesan awal (default tersembunyi)
+  function showWelcomeMessage() {
+    tbody.innerHTML = `<tr><td colspan="3" class="empty-message info-awal">
+      🔍 <strong>Selamat datang!</strong><br><br>
+      Silakan ketik nama siswa atau pilih kelas, lalu tekan tombol <strong>Cari</strong>.<br>
+      Data siswa akan muncul setelah Anda melakukan pencarian.
+    </td></tr>`;
+    resultInfo.innerText = 'Belum ada pencarian';
   }
 
+  // escape html
   function escapeHtml(str) {
     if (!str) return '';
     return str.replace(/[&<>]/g, function(m) {
@@ -551,37 +556,63 @@
     });
   }
 
-  // fungsi filter & pencarian
-  function filterData() {
+  // fungsi filter & pencarian (hanya menampilkan hasil jika ada kata kunci atau filter kelas tidak all)
+  function performSearch() {
     let keyword = searchInput.value.trim().toLowerCase();
     let selectedKelas = filterKelas.value;
     
+    // Kondisi: jika tidak ada input nama DAN filter kelas = 'all' -> tampilkan welcome message (default tersembunyi)
+    if (keyword === '' && selectedKelas === 'all') {
+      showWelcomeMessage();
+      return;
+    }
+    
+    // Filter data berdasarkan kriteria
     let filtered = siswaData.filter(siswa => {
       if (selectedKelas !== 'all' && siswa.kelas !== selectedKelas) return false;
       if (keyword !== '' && !siswa.nama.toLowerCase().includes(keyword)) return false;
       return true;
     });
     
-    renderTable(filtered);
+    // Tampilkan hasil atau pesan tidak ditemukan
+    if (filtered.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="3" class="empty-message">✨ Tidak ditemukan siswa yang cocok. Coba kata kunci lain atau reset filter.</td></tr>`;
+      resultInfo.innerText = `Tidak ada hasil`;
+      return;
+    }
+    
+    let html = '';
+    for (let s of filtered) {
+      html += `<tr>
+        <td><strong>${escapeHtml(s.nis)}</strong></td>
+        <td>${escapeHtml(s.nama)}</td>
+        <td><span class="kelas-badge">${escapeHtml(s.kelas)}</span></td>
+       </tr>`;
+    }
+    tbody.innerHTML = html;
+    resultInfo.innerText = `📌 ${filtered.length} siswa ditemukan`;
   }
 
-  // reset semua filter & input
+  // reset semua filter & input, kembali ke kondisi default (semua tersembunyi)
   function resetFilters() {
     searchInput.value = '';
     filterKelas.value = 'all';
-    renderTable(siswaData);
+    showWelcomeMessage();  // kembali ke pesan awal, data tidak ditampilkan
   }
 
   // event listeners
-  btnCari.addEventListener('click', filterData);
+  btnCari.addEventListener('click', performSearch);
   btnReset.addEventListener('click', resetFilters);
   searchInput.addEventListener('keypress', function(e) {
-    if (e.key === 'Enter') filterData();
+    if (e.key === 'Enter') performSearch();
   });
-  filterKelas.addEventListener('change', filterData);
+  filterKelas.addEventListener('change', function() {
+    // Jika filter berubah, langsung lakukan pencarian (tapi tetap mengikuti aturan: jika filter = all dan keyword kosong -> welcome)
+    performSearch();
+  });
   
-  // initial render
-  renderTable(siswaData);
+  // INITIAL: Tampilkan halaman kosong / pesan selamat datang (tidak ada data)
+  showWelcomeMessage();
 </script>
 </body>
 </html>
