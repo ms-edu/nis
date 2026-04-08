@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Pencarian NIS Siswa | MIN Singkawang</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', 'Roboto', system-ui, -apple-system, sans-serif;
+      background: #f0f7ff;
+      padding: 2rem 1rem;
+      color: #1e293b;
+    }
+
+    .container {
+      max-width: 1300px;
+      margin: 0 auto;
+    }
+
+    /* Header */
+    .header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .header h1 {
+      font-size: 1.8rem;
+      background: linear-gradient(135deg, #0f3b5f, #1e6f5c);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      margin-bottom: 0.5rem;
+    }
+
+    .header p {
+      color: #475569;
+      font-size: 1rem;
+    }
+
+    .badge-info {
+      background: #e2e8f0;
+      display: inline-block;
+      padding: 0.25rem 1rem;
+      border-radius: 40px;
+      font-size: 0.8rem;
+      color: #1e40af;
+      margin-top: 0.5rem;
+    }
+
+    /* Kartu Pencarian */
+    .search-card {
+      background: white;
+      border-radius: 32px;
+      box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.1);
+      padding: 1.8rem 1.5rem;
+      margin-bottom: 2rem;
+      transition: all 0.2s;
+    }
+
+    .search-wrapper {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      align-items: flex-end;
+    }
+
+    .input-group {
+      flex: 3;
+      min-width: 200px;
+    }
+
+    .input-group label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      font-size: 0.85rem;
+      color: #334155;
+      letter-spacing: 0.3px;
+    }
+
+    .input-group input {
+      width: 100%;
+      padding: 0.85rem 1rem;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 60px;
+      font-size: 1rem;
+      outline: none;
+      transition: 0.2s;
+      background: #fefefe;
+    }
+
+    .input-group input:focus {
+      border-color: #1e6f5c;
+      box-shadow: 0 0 0 3px rgba(30, 111, 92, 0.2);
+    }
+
+    .filter-group {
+      flex: 1;
+      min-width: 150px;
+    }
+
+    .filter-group select {
+      width: 100%;
+      padding: 0.85rem 1rem;
+      border-radius: 60px;
+      border: 1.5px solid #e2e8f0;
+      background: white;
+      font-size: 0.9rem;
+      cursor: pointer;
+      outline: none;
+    }
+
+    .btn-cari {
+      background: #1e6f5c;
+      border: none;
+      padding: 0.85rem 1.8rem;
+      border-radius: 60px;
+      color: white;
+      font-weight: bold;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    .btn-cari:hover {
+      background: #0f5a4a;
+      transform: translateY(-2px);
+    }
+
+    .btn-reset {
+      background: #f1f5f9;
+      color: #334155;
+      border: 1px solid #cbd5e1;
+    }
+
+    .btn-reset:hover {
+      background: #e2e8f0;
+      transform: none;
+    }
+
+    /* statistik */
+    .stats {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 1.2rem;
+      padding: 0 0.2rem;
+    }
+
+    .result-count {
+      background: #eef2ff;
+      padding: 0.4rem 1rem;
+      border-radius: 30px;
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+
+    /* tabel */
+    .table-container {
+      overflow-x: auto;
+      border-radius: 24px;
+      background: white;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+    }
+
+    th {
+      background: #1e293b;
+      color: white;
+      padding: 1rem 0.8rem;
+      text-align: left;
+      font-weight: 600;
+      position: sticky;
+      top: 0;
+    }
+
+    td {
+      padding: 0.9rem 0.8rem;
+      border-bottom: 1px solid #e9edf2;
+      color: #1e293b;
+    }
+
+    tr:hover td {
+      background-color: #f8fafc;
+    }
+
+    .kelas-badge {
+      background: #dbeafe;
+      color: #1e40af;
+      font-weight: 600;
+      padding: 0.2rem 0.8rem;
+      border-radius: 40px;
+      display: inline-block;
+      font-size: 0.75rem;
+    }
+
+    .empty-message {
+      text-align: center;
+      padding: 3rem;
+      color: #64748b;
+      font-style: italic;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 2rem;
+      font-size: 0.75rem;
+      color: #62748c;
+    }
+
+    @media (max-width: 680px) {
+      body {
+        padding: 1rem;
+      }
+      .search-card {
+        padding: 1.2rem;
+      }
+      th, td {
+        padding: 0.7rem 0.5rem;
+        font-size: 0.8rem;
+      }
+      .btn-cari, .btn-reset {
+        padding: 0.7rem 1.2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>📘 Pencarian NIS Siswa</h1>
+    <p>MIN Singkawang — Tahun Pelajaran 2025/2026</p>
+    <div class="badge-info">Data Kelas 4A · 4B · 4C · 5A · 5B · 6A · 6B</div>
+  </div>
+
+  <div class="search-card">
+    <div class="search-wrapper">
+      <div class="input-group">
+        <label>🔍 Cari berdasarkan NAMA SISWA</label>
+        <input type="text" id="searchName" placeholder="Ketik nama siswa... (contoh: Alfin, Abdul, Zahra)" autocomplete="off">
+      </div>
+      <div class="filter-group">
+        <label>📚 Filter Kelas</label>
+        <select id="filterKelas">
+          <option value="all">Semua Kelas</option>
+          <option value="4A">Kelas 4A</option>
+          <option value="4B">Kelas 4B</option>
+          <option value="4C">Kelas 4C</option>
+          <option value="5A">Kelas 5A</option>
+          <option value="5B">Kelas 5B</option>
+          <option value="6A">Kelas 6A</option>
+          <option value="6B">Kelas 6B</option>
+        </select>
+      </div>
+      <div style="display: flex; gap: 10px;">
+        <button class="btn-cari" id="btnCari">🔎 Cari</button>
+        <button class="btn-cari btn-reset" id="btnReset">⟳ Reset</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="stats">
+    <div class="result-count" id="resultInfo">Menampilkan semua siswa</div>
+    <div style="font-size: 0.8rem;">✨ klik reset untuk melihat semua data</div>
+  </div>
+
+  <div class="table-container">
+    <table id="siswaTable">
+      <thead>
+        <tr><th>NIS</th><th>Nama Lengkap</th><th>Kelas/Rombel</th></tr>
+      </thead>
+      <tbody id="tableBody">
+        <tr><td colspan="3" class="empty-message">Memuat data...</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <footer>Data bersumber dari sheet Kelas 4A s.d 6B MIN Singkawang. Pencarian tidak case-sensitive.</footer>
+</div>
+
+<script>
+  // ---------- DATA SISWA (NIS, Nama, Kelas) dari hasil ekstraksi ----------
+  // data lengkap 4A s.d 6B berdasarkan file yang diberikan
+  const siswaData = [
+    // KELAS 4A
+    { nis: "220061", nama: "ABDUL HAMID SYAMIL", kelas: "4A" },
+    { nis: "220007", nama: "AFRA AMALIA", kelas: "4A" },
+    { nis: "220015", nama: "APRILIA", kelas: "4A" },
+    { nis: "220018", nama: "AQILA NAFIZA PRASETIO", kelas: "4A" },
+    { nis: "220003", nama: "BADRUT TAMAM", kelas: "4A" },
+    { nis: "220047", nama: "DEA AULIA TIKA", kelas: "4A" },
+    { nis: "220002", nama: "FAJAR RAMANDIKA", kelas: "4A" },
+    { nis: "220028", nama: "FIKRI", kelas: "4A" },
+    { nis: "220001", nama: "JIHAN AQILA", kelas: "4A" },
+    { nis: "220010", nama: "KHALIFAH AQILA MYSHA TRI", kelas: "4A" },
+    { nis: "220017", nama: "LUTFIA APRILLIA", kelas: "4A" },
+    { nis: "220067", nama: "MOHAMMAD ARIF", kelas: "4A" },
+    { nis: "220062", nama: "MUHAMMAD HAYDAR ALI", kelas: "4A" },
+    { nis: "220031", nama: "MUHAMMAD IZAM", kelas: "4A" },
+    { nis: "220036", nama: "MUHAMMAD MUBAROK", kelas: "4A" },
+    { nis: "220045", nama: "MUHAMMAD REIHAN ALZAIDAN", kelas: "4A" },
+    { nis: "220016", nama: "MUHAMMAD SYAFI'UL ANAM", kelas: "4A" },
+    { nis: "220005", nama: "NADA FAJRIA SALSABILA", kelas: "4A" },
+    { nis: "220054", nama: "PUTRI AISA", kelas: "4A" },
+    { nis: "220049", nama: "TAUFIQURRAHMAN", kelas: "4A" },
+    { nis: "220060", nama: "ZAHIRATUL QHOMARIYAH", kelas: "4A" },
+    { nis: "220040", nama: "ZAKIA PUTRI", kelas: "4A" },
+    // KELAS 4B
+    { nis: "210016", nama: "ABDULLOH", kelas: "4B" },
+    { nis: "220044", nama: "ALFI SIDDIQIYAH", kelas: "4B" },
+    { nis: "240074", nama: "ALIN ALFIANSYAH SAMUDRA", kelas: "4B" },
+    { nis: "220046", nama: "CHAYRA PRAJA NADHIFA", kelas: "4B" },
+    { nis: "220042", nama: "LAILA HUMAYROH", kelas: "4B" },
+    { nis: "220034", nama: "MAWADDATUN NAFISAH", kelas: "4B" },
+    { nis: "220063", nama: "MOHAMMAD ARIF A'LA", kelas: "4B" },
+    { nis: "220011", nama: "MUHAMMAD ATIF ASLAM", kelas: "4B" },
+    { nis: "220038", nama: "MUHAMMAD ILHAM MAULANA", kelas: "4B" },
+    { nis: "220023", nama: "MUHAMMAD ROYHAN", kelas: "4B" },
+    { nis: "220041", nama: "MUHAMMAD WA'ILU AR-RAHMAN", kelas: "4B" },
+    { nis: "220033", nama: "MUHAMMAD ZACKY AL FARIZY", kelas: "4B" },
+    { nis: "220056", nama: "NAILA PUTRI", kelas: "4B" },
+    { nis: "220026", nama: "PUTRI YANA", kelas: "4B" },
+    { nis: "220043", nama: "RAISHA BILQIS AZZAHIRA", kelas: "4B" },
+    { nis: "240075", nama: "RIZKI JAHWAN AL-IMAN", kelas: "4B" },
+    { nis: "220020", nama: "SALSABILA", kelas: "4B" },
+    { nis: "220057", nama: "SYIFA MULYANI", kelas: "4B" },
+    { nis: "220048", nama: "MUZAYYENAH MUKAROMAH", kelas: "4B" },
+    { nis: "220037", nama: "USMAN ZAINI", kelas: "4B" },
+    { nis: "220024", nama: "ZAINUL ILHAM", kelas: "4B" },
+    { nis: "220032", nama: "ZIFA SITI AZZAHRA", kelas: "4B" },
+    // KELAS 4C
+    { nis: "220029", nama: "AHMAD AL GHIFARI PUTRA", kelas: "4C" },
+    { nis: "220066", nama: "AHMAD HAYDAR ALI", kelas: "4C" },
+    { nis: "220009", nama: "DEVI KURNIAWATI", kelas: "4C" },
+    { nis: "220050", nama: "FATHAN ARZIQI", kelas: "4C" },
+    { nis: "220019", nama: "FEBRIAN", kelas: "4C" },
+    { nis: "220059", nama: "HAFIZA", kelas: "4C" },
+    { nis: "220013", nama: "JULIANTO", kelas: "4C" },
+    { nis: "220022", nama: "KHOIRUL UMAM", kelas: "4C" },
+    { nis: "220006", nama: "LULU' MAMLU'AH", kelas: "4C" },
+    { nis: "220051", nama: "MOHAMMAD IBRAHIM MUFID", kelas: "4C" },
+    { nis: "220055", nama: "MUHAMMAD ANAN AKBAR", kelas: "4C" },
+    { nis: "220008", nama: "MUHAMMAD AZIZ ALFIQRI", kelas: "4C" },
+    { nis: "220052", nama: "MUHAMMAD KHOIRUL AKBAR", kelas: "4C" },
+    { nis: "220025", nama: "MUHAMMAD KHOLIS IMAN", kelas: "4C" },
+    { nis: "220004", nama: "MUHAMMAD RIZQY AL-FATIH", kelas: "4C" },
+    { nis: "220027", nama: "THALITA AGNIA RAVIVA", kelas: "4C" },
+    { nis: "220012", nama: "NAILA FUTRI", kelas: "4C" },
+    { nis: "220058", nama: "NUR AWALIA RAMADANI", kelas: "4C" },
+    { nis: "220035", nama: "NURUL KOMARIAH", kelas: "4C" },
+    { nis: "250086", nama: "RASEL ANDRIANI", kelas: "4C" },
+    { nis: "210056", nama: "RICCO MAHENDRA", kelas: "4C" },
+    { nis: "220030", nama: "ZAKI MUBAROK", kelas: "4C" },
+    // KELAS 5A
+    { nis: "210027", nama: "ADIBA DWI ASILA", kelas: "5A" },
+    { nis: "210026", nama: "ADIBA DWI SAKILA", kelas: "5A" },
+    { nis: "210011", nama: "ADIVA AHMED", kelas: "5A" },
+    { nis: "210012", nama: "AGUNG RENATA", kelas: "5A" },
+    { nis: "210021", nama: "ASKAR NUFAIL", kelas: "5A" },
+    { nis: "210010", nama: "DAFFA JIHAD FISABILILLAH", kelas: "5A" },
+    { nis: "210023", nama: "DAVA PRATAMA", kelas: "5A" },
+    { nis: "230069", nama: "FADIL", kelas: "5A" },
+    { nis: "240078", nama: "FAIZATUN NI'MAH", kelas: "5A" },
+    { nis: "210004", nama: "FAREL FIRMANSYAH", kelas: "5A" },
+    { nis: "210022", nama: "FATIMAH AZ-ZAHRA", kelas: "5A" },
+    { nis: "210002", nama: "HAFIZAM", kelas: "5A" },
+    { nis: "210015", nama: "ISMATUL ROHILAH", kelas: "5A" },
+    { nis: "210028", nama: "MAURA FEBRIA", kelas: "5A" },
+    { nis: "200020", nama: "MIA ANGGRAINI", kelas: "5A" },
+    { nis: "210008", nama: "MUHAMMAD DEMIYAN", kelas: "5A" },
+    { nis: "200014", nama: "MUHAMMAD HASAN AL MALIKI", kelas: "5A" },
+    { nis: "210020", nama: "MUHAMMAD KHOIRUL AZAM", kelas: "5A" },
+    { nis: "210024", nama: "MUHAMMAD NABIL", kelas: "5A" },
+    { nis: "210007", nama: "MUHAMMAD WAHYU SAPUTRA", kelas: "5A" },
+    { nis: "210025", nama: "MULTAZAM", kelas: "5A" },
+    { nis: "210013", nama: "NOVI AMALIA", kelas: "5A" },
+    { nis: "210018", nama: "NURIDZATI EL MUBARAK", kelas: "5A" },
+    { nis: "210003", nama: "OCTAVIANI", kelas: "5A" },
+    { nis: "210014", nama: "PUTRI ANJANI", kelas: "5A" },
+    { nis: "210006", nama: "PUTRI FIANI", kelas: "5A" },
+    { nis: "210019", nama: "RENALDO PRASETYO", kelas: "5A" },
+    { nis: "210005", nama: "RISKI ROMADHON", kelas: "5A" },
+    { nis: "210017", nama: "SAKINAH", kelas: "5A" },
+    { nis: "210001", nama: "SHAFIRA TAUFIQRY", kelas: "5A" },
+    { nis: "210029", nama: "ULFATUL BARIYAH", kelas: "5A" },
+    { nis: "210030", nama: "ZAINUL ARIF", kelas: "5A" },
+    // KELAS 5B
+    { nis: "210053", nama: "AHMAD YUSRIL", kelas: "5B" },
+    { nis: "210061", nama: "AISYAH ZAHRA", kelas: "5B" },
+    { nis: "210048", nama: "AKILATUL MURNI", kelas: "5B" },
+    { nis: "210057", nama: "ALIA MAYSARA", kelas: "5B" },
+    { nis: "210033", nama: "ALIYA FITRIA", kelas: "5B" },
+    { nis: "210051", nama: "ALVIANSYAH", kelas: "5B" },
+    { nis: "210043", nama: "ANGGA ARIF PUTRA", kelas: "5B" },
+    { nis: "210036", nama: "ANGGI SHILVIA PUTRI", kelas: "5B" },
+    { nis: "210035", nama: "ASHILAH", kelas: "5B" },
+    { nis: "210037", nama: "ASYFA", kelas: "5B" },
+    { nis: "210038", nama: "AZIQUR'ROHMAN ASARY", kelas: "5B" },
+    { nis: "210059", nama: "AZKYA RAMADHANI", kelas: "5B" },
+    { nis: "210060", nama: "BUDI SETIAWAN", kelas: "5B" },
+    { nis: "210047", nama: "HAFIFAH RAMADHANI", kelas: "5B" },
+    { nis: "230070", nama: "ILHAM", kelas: "5B" },
+    { nis: "210058", nama: "LAILATUL ADEWIYEH", kelas: "5B" },
+    { nis: "210044", nama: "LAILATUL RAMADANIA", kelas: "5B" },
+    { nis: "210031", nama: "LUTFI ABDILLAH", kelas: "5B" },
+    { nis: "210041", nama: "MUHAMMAD ADAM AIMAN", kelas: "5B" },
+    { nis: "210055", nama: "MUHAMMAD FAHROZI", kelas: "5B" },
+    { nis: "210050", nama: "MUHAMMAD HASANUDIN", kelas: "5B" },
+    { nis: "200050", nama: "MUHAMMAD RIZAL", kelas: "5B" },
+    { nis: "210046", nama: "MUHAMMAD ZAINUL ARIFIN", kelas: "5B" },
+    { nis: "210034", nama: "NABILA OKTAVIA", kelas: "5B" },
+    { nis: "210052", nama: "NAURA SYIFA AZZURA", kelas: "5B" },
+    { nis: "210045", nama: "NIKMATUL KHOIRIYAH", kelas: "5B" },
+    { nis: "210039", nama: "NURUL NAJWA", kelas: "5B" },
+    { nis: "210049", nama: "RAFA ASKA PUTRA", kelas: "5B" },
+    { nis: "210040", nama: "RAFFI MAULANA", kelas: "5B" },
+    { nis: "210032", nama: "RAKHA DESMINANDO", kelas: "5B" },
+    { nis: "210042", nama: "RATI ANDINI", kelas: "5B" },
+    { nis: "190008", nama: "WAEL HASAN", kelas: "5B" },
+    // KELAS 6A
+    { nis: "200028", nama: "ABDUL ROHMAN", kelas: "6A" },
+    { nis: "200001", nama: "AKTARADI TOMI ASDIRI", kelas: "6A" },
+    { nis: "200010", nama: "AL FATIR", kelas: "6A" },
+    { nis: "200015", nama: "ALMER BAHRAIN ABIYU", kelas: "6A" },
+    { nis: "200019", nama: "ANGGITA ANDIANA", kelas: "6A" },
+    { nis: "200006", nama: "DAFA", kelas: "6A" },
+    { nis: "200023", nama: "FAHMY RAMADHAN", kelas: "6A" },
+    { nis: "200013", nama: "FAIZAL ARIFIN", kelas: "6A" },
+    { nis: "200021", nama: "FATIMATUZZAHRO", kelas: "6A" },
+    { nis: "190030", nama: "IBNU QOYYIM AL-JAUZIYYAH", kelas: "6A" },
+    { nis: "200017", nama: "JAFIKA NEYLA", kelas: "6A" },
+    { nis: "200005", nama: "LULU QOMARIYAH", kelas: "6A" },
+    { nis: "200026", nama: "MIFTAHUL RIZKY ROMADHON", kelas: "6A" },
+    { nis: "200007", nama: "MUHAMMAD ALI AKBAR", kelas: "6A" },
+    { nis: "200003", nama: "MUHAMMAD AZIDAN", kelas: "6A" },
+    { nis: "200018", nama: "MUHAMMAD FAUZY", kelas: "6A" },
+    { nis: "200012", nama: "MUHAMMAD HAIKAL FIKRI", kelas: "6A" },
+    { nis: "190068", nama: "MUHAMMAD HASIM AS'ARI", kelas: "6A" },
+    { nis: "190028", nama: "MUHSIN AL FARISI", kelas: "6A" },
+    { nis: "200022", nama: "MUYASSAROH", kelas: "6A" },
+    { nis: "200002", nama: "NOVA OKTAVIANI", kelas: "6A" },
+    { nis: "200008", nama: "NURUL HIDAYAH", kelas: "6A" },
+    { nis: "200016", nama: "QUEISHA ANYA AZZAHRA", kelas: "6A" },
+    { nis: "200027", nama: "ROHANI", kelas: "6A" },
+    { nis: "200004", nama: "SAHRU RAMADAN", kelas: "6A" },
+    { nis: "190031", nama: "SAIFULLOH", kelas: "6A" },
+    { nis: "200024", nama: "SANIA ALFA SAKINAH", kelas: "6A" },
+    { nis: "200025", nama: "SITY KHOTIJEH", kelas: "6A" },
+    { nis: "200011", nama: "ZACKIYATUL MAR ATI", kelas: "6A" },
+    { nis: "200009", nama: "ZAHROTUL MAR ATI", kelas: "6A" },
+    // KELAS 6B
+    { nis: "200044", nama: "AHMAD DANIEL", kelas: "6B" },
+    { nis: "190027", nama: "AHMAD FIKI", kelas: "6B" },
+    { nis: "200048", nama: "AHMAD JEFRI", kelas: "6B" },
+    { nis: "210069", nama: "ALI ZAINAL ABIDIN", kelas: "6B" },
+    { nis: "200033", nama: "ARIANSYAH PUTRA ARMI", kelas: "6B" },
+    { nis: "200047", nama: "AROHMAN HIDAYAH", kelas: "6B" },
+    { nis: "200040", nama: "AURELIA NAFIZA", kelas: "6B" },
+    { nis: "200039", nama: "AYU ANDRIANI", kelas: "6B" },
+    { nis: "220065", nama: "BAGUS CAHYO PRAKOSO", kelas: "6B" },
+    { nis: "200036", nama: "BILQIS AULIA AZKA", kelas: "6B" },
+    { nis: "200051", nama: "BUDI NURYANTO", kelas: "6B" },
+    { nis: "210072", nama: "FAISHOL MAULANA", kelas: "6B" },
+    { nis: "200037", nama: "FARIS IBRA", kelas: "6B" },
+    { nis: "200031", nama: "FINA HASANATUL AMALIA", kelas: "6B" },
+    { nis: "200035", nama: "HAFIS", kelas: "6B" },
+    { nis: "200049", nama: "MUHAMMAD HABIBI", kelas: "6B" },
+    { nis: "200029", nama: "MUHAMMAD IKBAL", kelas: "6B" },
+    { nis: "200056", nama: "MUHAMMAD KHOIRON", kelas: "6B" },
+    { nis: "190036", nama: "MUHAMMAD RIFA'I", kelas: "6B" },
+    { nis: "200055", nama: "MUHAMMAD ROIHAN", kelas: "6B" },
+    { nis: "190035", nama: "MUHAMMAD ZAHRUL", kelas: "6B" },
+    { nis: "200030", nama: "NAILA ULFA", kelas: "6B" },
+    { nis: "190069", nama: "NURUL HUSYEN", kelas: "6B" },
+    { nis: "200034", nama: "PUTRI AYU", kelas: "6B" },
+    { nis: "200032", nama: "PUTRI LAILATU SYARIFAH", kelas: "6B" },
+    { nis: "200052", nama: "RIZAL SAIFUDDIN", kelas: "6B" },
+    { nis: "200042", nama: "SALVAWATI", kelas: "6B" },
+    { nis: "200045", nama: "SITI UNAISAH", kelas: "6B" },
+    { nis: "190029", nama: "YUDI ANSYAH", kelas: "6B" }
+  ];
+
+  // DOM elements
+  const tbody = document.getElementById('tableBody');
+  const searchInput = document.getElementById('searchName');
+  const filterKelas = document.getElementById('filterKelas');
+  const btnCari = document.getElementById('btnCari');
+  const btnReset = document.getElementById('btnReset');
+  const resultInfo = document.getElementById('resultInfo');
+
+  // fungsi render tabel
+  function renderTable(dataArray) {
+    if (!dataArray.length) {
+      tbody.innerHTML = '<tr><td colspan="3" class="empty-message">✨ Tidak ditemukan siswa yang cocok. Coba kata kunci lain atau reset filter.</td></tr>';
+      resultInfo.innerText = `Tidak ada hasil`;
+      return;
+    }
+    let html = '';
+    for (let s of dataArray) {
+      html += `<tr>
+        <td><strong>${escapeHtml(s.nis)}</strong></td>
+        <td>${escapeHtml(s.nama)}</td>
+        <td><span class="kelas-badge">${escapeHtml(s.kelas)}</span></td>
+      </tr>`;
+    }
+    tbody.innerHTML = html;
+    resultInfo.innerText = `📌 ${dataArray.length} siswa ditemukan`;
+  }
+
+  function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/[&<>]/g, function(m) {
+      if (m === '&') return '&amp;';
+      if (m === '<') return '&lt;';
+      if (m === '>') return '&gt;';
+      return m;
+    }).replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, function(c) {
+      return c;
+    });
+  }
+
+  // fungsi filter & pencarian
+  function filterData() {
+    let keyword = searchInput.value.trim().toLowerCase();
+    let selectedKelas = filterKelas.value;
+    
+    let filtered = siswaData.filter(siswa => {
+      // filter kelas
+      if (selectedKelas !== 'all' && siswa.kelas !== selectedKelas) return false;
+      // filter nama (pencarian substring tidak case sensitive)
+      if (keyword !== '' && !siswa.nama.toLowerCase().includes(keyword)) return false;
+      return true;
+    });
+    
+    renderTable(filtered);
+  }
+
+  // reset semua filter & input
+  function resetFilters() {
+    searchInput.value = '';
+    filterKelas.value = 'all';
+    renderTable(siswaData);
+  }
+
+  // event listeners
+  btnCari.addEventListener('click', filterData);
+  btnReset.addEventListener('click', resetFilters);
+  // tekan enter di input pencarian
+  searchInput.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') filterData();
+  });
+  filterKelas.addEventListener('change', filterData);
+  
+  // initial render
+  renderTable(siswaData);
+</script>
+</body>
+</html>
